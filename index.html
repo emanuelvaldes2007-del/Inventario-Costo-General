@@ -3044,7 +3044,7 @@ const MAESTRAS_DEPARTAMENTOS = {
             <td class="num" style="color:#34d399;font-weight:700;">${pisoKg.toFixed(2)}</td>
             <td class="num" style="color:#4ade80;font-weight:800;">${kg.toFixed(2)}</td>
             <td class="num">
-              <input type="number" value="${costoKg || ""}" placeholder="$0" onchange="actualizarCostoKgD93('${corte.replace(/'/g, "\'")}', this.value)"
+              <input type="number" value="${costoKg || ""}" placeholder="$0" onchange="actualizarCostoKgD93('${corte.replace(/'/g, "\\'")}', this.value)"
                 style="width:70px;background:#1e293b;border:1px solid #475569;border-radius:6px;padding:4px 6px;text-align:right;color:#fcd34d;font-weight:700;" />
             </td>
             <td class="num" style="font-weight:800;">${fmtCLP(sub)}</td>
@@ -3075,20 +3075,13 @@ const MAESTRAS_DEPARTAMENTOS = {
         const pisoC = d.piso.length;
         const depKg = d.deposito.reduce((s, c) => s + c.kilos, 0);
         const pisoKg = d.piso.reduce((s, c) => s + c.kilos, 0);
-        const totKg = depKg + pisoKg;
 
-        if ((depC + pisoC) > 0 || (d.costoKg || 0) > 0) {
+        if ((depC + pisoC) > 0) {
           rows.push({
             DEPARTAMENTO: 93,
             CORTE: corte,
-            "CAJAS DEPOSITO": depC,
             "KG DEPOSITO": parseFloat(depKg.toFixed(2)),
-            "CAJAS PISO VENTA": pisoC,
-            "KG PISO VENTA": parseFloat(pisoKg.toFixed(2)),
-            "N° CAJAS TOTAL": depC + pisoC,
-            "KILOS NETOS TOTAL (KG)": parseFloat(totKg.toFixed(2)),
-            "COSTO POR KG ($)": d.costoKg || 0,
-            "COSTO TOTAL ($)": Math.round(totKg * (d.costoKg || 0))
+            "KG PISO VENTA": parseFloat(pisoKg.toFixed(2))
           });
         }
       });
@@ -3448,30 +3441,15 @@ const MAESTRAS_DEPARTAMENTOS = {
       const cfg = DEPT_CONFIG[deptKey];
       const lista = MAESTRAS_DEPARTAMENTOS[deptKey] || [];
       return lista.map((item) => {
-        const rec = ensureRecordDept(deptKey, item.item);
-        const effCaja = getEffectiveQtyCajaDept(deptKey, item);
         const dep = getSectionTotalDept(deptKey, item, "deposito");
         const piso = getSectionTotalDept(deptKey, item, "piso");
-        const totalFis = dep + piso;
         return {
           "N° DPTO": cfg.num,
           ITEM: Number(item.item),
           "UPC MAESTRA": item.upc,
           DESCRIPCION: item.desc,
-          CATEGORIA: item.cat,
-          "FACTOR CAJA MAESTRA": item.qtyCaja,
-          "FACTOR CAJA USADO": effCaja,
-          "DEP CAJ": rec.deposito.caja || 0,
-          "DEP KG": rec.deposito.kg || 0,
-          "DEP UND": rec.deposito.und || 0,
           "CONTEO DEPOSITO": dep,
-          "PISO CAJ": rec.piso.caja || 0,
-          "PISO KG": rec.piso.kg || 0,
-          "PISO UND": rec.piso.und || 0,
-          "CONTEO PISO VENTAS": piso,
-          "TOTAL FISICO": totalFis,
-          "COSTO UNITARIO": item.costo,
-          "COSTO TOTAL FISICO": totalFis * item.costo
+          "CONTEO PISO VENTAS": piso
         };
       });
     }
